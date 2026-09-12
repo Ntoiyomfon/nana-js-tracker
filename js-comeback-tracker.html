@@ -1,0 +1,349 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F5F0;
+    --grid:#E4E6DE;
+    --card:#FFFFFF;
+    --ink:#1D2420;
+    --ink-soft:#636C65;
+    --line:#DADDD4;
+    --amber:#B5651D;
+    --amber-soft:#F1DFCB;
+    --teal:#2F6F62;
+    --teal-soft:#DCEAE6;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/100% 28px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/28px 100%,
+      var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 64px;}
+  header{margin-bottom:20px;}
+  h1{
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    margin:0 0 4px;
+  }
+  .sub{
+    color:var(--ink-soft);
+    font-size:14px;
+    margin:0;
+  }
+  .ruler{
+    margin-top:22px;
+    background:var(--card);
+    border:1px solid var(--line);
+    padding:14px 16px;
+  }
+  .ruler-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .ruler-label{font-size:13px;color:var(--ink-soft);}
+  .ruler-pct{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;}
+  .ruler-track{position:relative;height:10px;background:var(--grid);}
+  .ruler-fill{position:absolute;top:0;left:0;height:100%;background:var(--amber);transition:width .25s ease;}
+  .ruler-ticks{display:flex;justify-content:space-between;margin-top:6px;}
+  .ruler-ticks span{width:1px;height:5px;background:var(--line);}
+
+  .layout{display:grid;grid-template-columns:220px 1fr;gap:0;margin-top:24px;border:1px solid var(--line);background:var(--card);}
+  @media (max-width:680px){ .layout{grid-template-columns:1fr;} }
+
+  .sidebar{border-right:1px solid var(--line);padding:8px 0;}
+  @media (max-width:680px){ .sidebar{border-right:none;border-bottom:1px solid var(--line);display:flex;overflow-x:auto;padding:8px;} }
+  .phase-group{padding:10px 14px 4px;}
+  @media (max-width:680px){ .phase-group{padding:6px 8px;flex:0 0 auto;} }
+  .phase-name{font-size:11.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .week-row{
+    display:flex;align-items:center;gap:8px;
+    padding:6px 4px;cursor:pointer;
+    border-left:3px solid transparent;
+    font-size:13.5px;
+  }
+  @media (max-width:680px){ .week-row{white-space:nowrap;border-left:none;border-bottom:3px solid transparent;} }
+  .week-row:hover{background:var(--bg);}
+  .week-row.active{border-left-color:var(--amber);background:var(--bg);font-weight:600;}
+  @media (max-width:680px){ .week-row.active{border-bottom-color:var(--amber);} }
+  .week-num{font-family:'IBM Plex Mono',monospace;color:var(--ink-soft);font-size:12px;width:18px;flex:none;}
+  .dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--ink-soft);flex:none;}
+  .dot.full{background:var(--teal);border-color:var(--teal);}
+  .dot.partial{background:var(--amber);border-color:var(--amber);}
+
+  .reset-row{padding:10px 14px;margin-top:6px;}
+  .reset-btn{background:none;border:none;color:var(--ink-soft);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+  .reset-btn.confirm{color:var(--amber);}
+
+  main{padding:24px 28px;}
+  .eyebrow{font-size:12.5px;color:var(--ink-soft);margin-bottom:2px;}
+  .week-title{font-size:22px;font-weight:700;margin:0 0 18px;}
+
+  .section{margin-bottom:24px;}
+  .section-label{font-size:13px;font-weight:600;margin-bottom:10px;}
+
+  .topic-row{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:8px 0;border-top:1px solid var(--line);
+    font-size:14.5px;line-height:1.4;
+  }
+  .topic-row:first-of-type{border-top:none;}
+  input[type="checkbox"]{
+    appearance:none;width:16px;height:16px;flex:none;margin-top:2px;
+    border:1.5px solid var(--ink-soft);cursor:pointer;position:relative;
+  }
+  input[type="checkbox"]:checked{background:var(--teal);border-color:var(--teal);}
+  input[type="checkbox"]:checked::after{
+    content:'';position:absolute;left:4px;top:1px;width:4px;height:8px;
+    border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg);
+  }
+  .topic-row label{cursor:pointer;}
+  .topic-row.done label{color:var(--ink-soft);text-decoration:line-through;}
+
+  .days{display:flex;gap:6px;}
+  .day{
+    flex:1;text-align:center;padding:10px 0;border:1.5px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;cursor:pointer;
+    color:var(--ink-soft);
+  }
+  .day.done{background:var(--amber);border-color:var(--amber);color:#fff;font-weight:600;}
+
+  .project-box{border:1px solid var(--line);padding:14px;}
+  .project-box .topic-row{border-top:none;padding:0 0 12px;}
+  textarea{
+    width:100%;border:1px solid var(--line);background:var(--bg);
+    font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;padding:8px;
+    resize:vertical;min-height:44px;color:var(--ink);
+  }
+  textarea::placeholder{color:var(--ink-soft);}
+
+  .footnote{font-size:12px;color:var(--ink-soft);margin-top:6px;}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Build log</h1>
+    <p class="sub">15 weeks &mdash; Sept 12 to Dec 31. Fundamentals, then real data, then React, then ship it.</p>
+    <div class="ruler">
+      <div class="ruler-top">
+        <span class="ruler-label">Overall progress</span>
+        <span class="ruler-pct" id="pctLabel">0%</span>
+      </div>
+      <div class="ruler-track"><div class="ruler-fill" id="fillBar" style="width:0%"></div></div>
+      <div class="ruler-ticks" id="ticks"></div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script>
+const WEEKS = [
+  {id:1, phase:1, topics:["Variables & data types","Operators & expressions","Conditionals — if/else and switch","Writing & calling functions"], project:"Number-guessing game, built without the tutorial open after step one."},
+  {id:2, phase:1, topics:["Loops — for and while","Arrays — indexing, push, pop","String methods","Debugging with console.log, on purpose"], project:"Rebuild the guessing game to track score across multiple rounds using an array."},
+  {id:3, phase:1, topics:["Objects & object literals","Selecting elements — querySelector","Event listeners — click, input","Updating text & attributes in the DOM"], project:"Interactive to-do list — add and remove items through the DOM."},
+  {id:4, phase:1, topics:["Functions — parameters, return values, first callbacks","Scope, and let vs var","Refactor pass on Weeks 1–3"], project:"Quiz app with a running score, rendered entirely through the DOM."},
+  {id:5, phase:2, topics:["Array methods — map, filter, reduce","Template literals","Destructuring"], project:"Add filtering and sorting to the to-do list."},
+  {id:6, phase:2, topics:["Callbacks & setTimeout","Promises — the concept and .then","First pass at async/await"], project:"Countdown / timer app."},
+  {id:7, phase:2, topics:["The fetch API","Working with JSON responses","Loading and error states"], project:"Weather app pulling live data from a public API."},
+  {id:8, phase:2, topics:["try/catch error handling","localStorage — reading and writing"], project:"Add persistence to the to-do list — refresh the page, the data survives."},
+  {id:9, phase:2, topics:["Refactor & clean up two earlier projects","Write real READMEs","Proper git commits, pushed to GitHub"], project:"Expense tracker with localStorage persistence."},
+  {id:10, phase:3, topics:["JSX & components","Props","Rendering lists in React"], project:"Static React rebuild of a project you already have."},
+  {id:11, phase:3, topics:["State with useState","Handling events in React","useEffect basics"], project:"Make the static React project fully interactive."},
+  {id:12, phase:3, topics:["Rebuild the to-do or expense tracker fully in React","Compare it honestly to the vanilla version"], project:"Working React to-do or expense app."},
+  {id:13, phase:3, topics:["Forms in React","Component composition & file structure","Stretch: basic react-router"], project:"Second React project, built from a blank file — no vanilla version to lean on."},
+  {id:14, phase:4, topics:["Deploy every project — Vercel or Netlify","Write READMEs with screenshots"], project:"All projects live, with public URLs."},
+  {id:15, phase:4, topics:["Build a simple portfolio site listing the projects","Final polish pass","Share it publicly — somewhere with real eyes on it"], project:"Portfolio site, live and public."},
+];
+const PHASE_NAMES = {1:"Phase 1: Fundamentals rebuilt", 2:"Phase 2: Real data & async", 3:"Phase 3: React", 4:"Phase 4: Ship it"};
+const DAY_LETTERS = ["M","T","W","T","F","S","S"];
+const STORAGE_KEY = "js-tracker-state-v1";
+
+let state = { topics:{}, project:{}, days:{}, notes:{}, selected:1 };
+let resetArmed = false;
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state = Object.assign(state, parsed);
+    }
+  }catch(e){ /* no saved state yet — fine, use defaults */ }
+  renderSidebar();
+  renderMain();
+}
+
+async function saveState(){
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e){ console.error("Could not save progress", e); }
+}
+
+function weekTotals(w){
+  const topicsDone = w.topics.filter(t => state.topics[w.id+"|"+t]).length;
+  const projectDone = state.project[w.id] ? 1 : 0;
+  const daysArr = state.days[w.id] || [];
+  const daysDone = daysArr.filter(Boolean).length;
+  const total = w.topics.length + 1 + 7;
+  const done = topicsDone + projectDone + daysDone;
+  return {done, total};
+}
+
+function overallProgress(){
+  let done=0, total=0;
+  WEEKS.forEach(w=>{ const t=weekTotals(w); done+=t.done; total+=t.total; });
+  return total ? Math.round((done/total)*100) : 0;
+}
+
+function renderTicks(){
+  const el = document.getElementById("ticks");
+  el.innerHTML = WEEKS.map(()=>"<span></span>").join("");
+}
+
+function renderProgressBar(){
+  const pct = overallProgress();
+  document.getElementById("pctLabel").textContent = pct + "%";
+  document.getElementById("fillBar").style.width = pct + "%";
+}
+
+function renderSidebar(){
+  const el = document.getElementById("sidebar");
+  let html = "";
+  [1,2,3,4].forEach(phase=>{
+    html += `<div class="phase-group"><div class="phase-name">${PHASE_NAMES[phase]}</div>`;
+    WEEKS.filter(w=>w.phase===phase).forEach(w=>{
+      const t = weekTotals(w);
+      let dotClass = "";
+      if(t.done === t.total) dotClass = "full";
+      else if(t.done > 0) dotClass = "partial";
+      const active = w.id === state.selected ? "active" : "";
+      html += `<div class="week-row ${active}" data-week="${w.id}">
+        <span class="week-num">${String(w.id).padStart(2,"0")}</span>
+        <span class="dot ${dotClass}"></span>
+        <span>Week ${w.id}</span>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+  el.querySelectorAll(".week-row").forEach(row=>{
+    row.addEventListener("click", ()=>{
+      state.selected = parseInt(row.dataset.week, 10);
+      renderSidebar();
+      renderMain();
+    });
+  });
+
+  const resetRow = document.createElement("div");
+  resetRow.className = "reset-row";
+  resetRow.innerHTML = `<button class="reset-btn" id="resetBtn">Reset all progress</button>`;
+  el.appendChild(resetRow);
+  document.getElementById("resetBtn").addEventListener("click", (e)=>{
+    if(!resetArmed){
+      resetArmed = true;
+      e.target.textContent = "Click again to confirm";
+      e.target.classList.add("confirm");
+      setTimeout(()=>{ resetArmed=false; e.target.textContent="Reset all progress"; e.target.classList.remove("confirm"); }, 3000);
+    } else {
+      state = { topics:{}, project:{}, days:{}, notes:{}, selected: state.selected };
+      saveState();
+      renderSidebar();
+      renderMain();
+    }
+  });
+}
+
+function renderMain(){
+  const w = WEEKS.find(w=>w.id===state.selected);
+  const el = document.getElementById("main");
+  const daysArr = state.days[w.id] || new Array(7).fill(false);
+
+  let topicsHtml = w.topics.map(t=>{
+    const key = w.id+"|"+t;
+    const checked = !!state.topics[key];
+    return `<div class="topic-row ${checked?"done":""}">
+      <input type="checkbox" id="t-${key}" ${checked?"checked":""} data-topickey="${key}">
+      <label for="t-${key}">${t}</label>
+    </div>`;
+  }).join("");
+
+  let daysHtml = DAY_LETTERS.map((letter,i)=>{
+    const done = !!daysArr[i];
+    return `<div class="day ${done?"done":""}" data-dayidx="${i}">${letter}</div>`;
+  }).join("");
+
+  const projectDone = !!state.project[w.id];
+  const noteVal = state.notes[w.id] || "";
+
+  el.innerHTML = `
+    <div class="eyebrow">${PHASE_NAMES[w.phase]}</div>
+    <div class="week-title">Week ${w.id}</div>
+
+    <div class="section">
+      <div class="section-label">Topics to work through</div>
+      ${topicsHtml}
+    </div>
+
+    <div class="section">
+      <div class="section-label">Practice log (90 min minimum, every day)</div>
+      <div class="days">${daysHtml}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Ship this week</div>
+      <div class="project-box">
+        <div class="topic-row ${projectDone?"done":""}">
+          <input type="checkbox" id="p-${w.id}" ${projectDone?"checked":""}>
+          <label for="p-${w.id}">${w.project}</label>
+        </div>
+        <textarea placeholder="Link, blockers, notes…">${noteVal}</textarea>
+      </div>
+    </div>
+    <p class="footnote">Progress saves automatically.</p>
+  `;
+
+  el.querySelectorAll("[data-topickey]").forEach(cb=>{
+    cb.addEventListener("change", ()=>{
+      state.topics[cb.dataset.topickey] = cb.checked;
+      saveState(); renderSidebar(); renderProgressBar();
+      cb.closest(".topic-row").classList.toggle("done", cb.checked);
+    });
+  });
+
+  el.querySelectorAll(".day").forEach(dayEl=>{
+    dayEl.addEventListener("click", ()=>{
+      const idx = parseInt(dayEl.dataset.dayidx,10);
+      const arr = state.days[w.id] || new Array(7).fill(false);
+      arr[idx] = !arr[idx];
+      state.days[w.id] = arr;
+      saveState(); renderSidebar(); renderProgressBar();
+      dayEl.classList.toggle("done", arr[idx]);
+    });
+  });
+
+  const projCb = document.getElementById("p-"+w.id);
+  projCb.addEventListener("change", ()=>{
+    state.project[w.id] = projCb.checked;
+    saveState(); renderSidebar(); renderProgressBar();
+    projCb.closest(".topic-row").classList.toggle("done", projCb.checked);
+  });
+
+  const noteEl = el.querySelector("textarea");
+  noteEl.addEventListener("blur", ()=>{
+    state.notes[w.id] = noteEl.value;
+    saveState();
+  });
+
+  renderProgressBar();
+}
+
+renderTicks();
+loadState();
+</script>
